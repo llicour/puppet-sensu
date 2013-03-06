@@ -1,0 +1,7 @@
+# Sensu Dashboard :
+http://<%= fqdn %>:8181/
+Login : admin
+
+# RabbitMQ dashboard :
+http://<%= fqdn %>:55672/
+Login : guest

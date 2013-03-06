@@ -1,0 +1,8 @@
+{
+    "client": {
+      "name": "<%= fqdn %>",
+      "address": "<%= ipaddress %>",
+      "_name": "<%= fqdn.gsub(/\./, '_') %>",
+      "subscriptions": [ "common", "test", "stats" ]
+    }
+}
