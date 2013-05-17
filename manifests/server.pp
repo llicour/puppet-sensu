@@ -72,7 +72,7 @@ class sensu::server ( $up = hiera('sensu::server::up', true) ) inherits sensu {
         require => File[ '/root/sensu' ],
     }
 
-    include firewall
+    include myfirewall
 
     firewall { '100 Sensu Dashboard' :
           chain  => 'INPUT',
