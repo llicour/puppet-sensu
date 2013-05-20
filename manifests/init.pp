@@ -4,13 +4,7 @@
 
 class sensu( $mqsrv='el6a.labolinux.fr' ) {
 
-    yumrepo { 'sensu' :
-        baseurl  =>
-              'http://repos.sensuapp.org/yum/el/$releasever/$basearch/',
-        descr    => 'sensu-main',
-        enabled  => 1,
-        gpgcheck => 0,
-    }
+    include yum::sensu
 
     package { 'sensu' :
         ensure  => present,
