@@ -1,7 +1,10 @@
+# Sensu monitoring server
+# cf http://sensuapp.org/
+
 class sensu::server ( $up = true,
                       $dashboard_user     = "admin",
                       $dashboard_password = "plokiploki",
-) inherits sensu {
+ ) inherits sensu {
 
     include rabbitmq
     include redis
