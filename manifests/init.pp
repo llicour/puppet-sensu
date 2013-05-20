@@ -2,9 +2,15 @@
 # https://github.com/joemiller/joemiller.me-intro-to-sensu
 # http://joemiller.me/2012/02/02/sensu-and-graphite/
 
-class sensu( $mqsrv='el6a.labolinux.fr' ) {
+class sensu( $mqsrv='el6a.labolinux.fr',
+             $repo='http://repos.sensuapp.org/yum/el/$release/$arch' ) {
 
-    include yum::sensu
+    yumrepo { 'sensu' :
+        baseurl  => $repo,
+        descr    => 'sensu',
+        enabled  => 1,
+        gpgcheck => 0,
+    }
 
     package { 'sensu' :
         ensure  => present,
