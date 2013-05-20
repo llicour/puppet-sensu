@@ -12,12 +12,14 @@ class sensu::server ( $up = true,
     rabbitmq_vhost { '/sensu' :
         ensure   => present,
         provider => 'rabbitmqctl',
+        require   => Service['rabbitmq-server'],
     }
 
     rabbitmq_user { "$sensu::mqsrv_user" :
         admin     => true,
         password  => $sensu::mqsrv_password,
         provider  => 'rabbitmqctl',
+        require   => Service['rabbitmq-server'],
     }
 
     rabbitmq_user_permissions { 'sensu@/sensu' :
