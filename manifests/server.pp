@@ -1,4 +1,7 @@
-class sensu::server ( $up = hiera('sensu::server::up', true) ) inherits sensu {
+class sensu::server ( $up = true,
+                      $dashboard_user     = "admin",
+                      $dashboard_password = "plokiploki",
+) inherits sensu {
 
     include rabbitmq
     include redis
@@ -8,15 +11,15 @@ class sensu::server ( $up = hiera('sensu::server::up', true) ) inherits sensu {
         provider => 'rabbitmqctl',
     }
 
-    rabbitmq_user { 'sensu' :
+    rabbitmq_user { "$sensu::mqsrv_user" :
         admin     => true,
-        password  => 'plokiploki',
+        password  => $sensu::mqsrv_password,
         provider  => 'rabbitmqctl',
     }
 
     rabbitmq_user_permissions { 'sensu@/sensu' :
         require              => [ Rabbitmq_vhost[ '/sensu' ],
-                                  Rabbitmq_user[ 'sensu' ], ],
+                                  Rabbitmq_user[ "$sensu::mqsrv_user" ], ],
         configure_permission => '.*',
         read_permission      => '.*',
         write_permission     => '.*',
@@ -25,6 +28,18 @@ class sensu::server ( $up = hiera('sensu::server::up', true) ) inherits sensu {
 
     $sensusrv = [ 'sensu-server', 'sensu-api', 'sensu-dashboard' ]
 
+    file { 'server.json' :
+        ensure  => present,
+        path    => '/etc/sensu/conf.d/server.json',
+        owner   => 'sensu',
+        group   => 'sensu',
+        mode    => '0640',
+        content => template( 'sensu/conf.d/server.json' ),
+        require => [ Package[ 'sensu' ],
+                     File[ '/etc/sensu/conf.d' ], ],
+        notify => [ Service[$sensusrv] ],
+    }
+
     service { $sensusrv :
         ensure  => $up? { true    => running,
                           'true'  => running,
@@ -32,9 +47,9 @@ class sensu::server ( $up = hiera('sensu::server::up', true) ) inherits sensu {
         enable  => $up? { true    => true,
                           'true'  => true,
                           default => false },
-        require => [  Package[ 'sensu', 'sensu-plugin' ],
+        require => [  Package[ 'sensu' ],
                       Rabbitmq_user_permissions[ 'sensu@/sensu' ],
-                      File[ 'client_key.pem','config.json','client.json',
+                      File[ 'server.json',
                             'checks.json','handlers.json' ], ],
     }
 
@@ -72,7 +87,8 @@ class sensu::server ( $up = hiera('sensu::server::up', true) ) inherits sensu {
         require => File[ '/root/sensu' ],
     }
 
-    include firewall
+/*
+    include myfirewall
 
     firewall { '100 Sensu Dashboard' :
           chain  => 'INPUT',
@@ -89,5 +105,7 @@ class sensu::server ( $up = hiera('sensu::server::up', true) ) inherits sensu {
           dport  => '4567',
           action => 'accept',
     }
+*/
+
 }
 

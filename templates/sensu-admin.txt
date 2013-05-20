@@ -1,7 +1,7 @@
 # Sensu Dashboard :
-http://<%= fqdn %>:8181/
-Login : admin
+http://<%= @fqdn %>:8181/
+Login : <%= @dashboard_user %>
 
 # RabbitMQ dashboard :
-http://<%= fqdn %>:55672/
+http://<%= @fqdn %>:55672/
 Login : guest

@@ -1,8 +1,19 @@
 {
     "client": {
-      "name": "<%= fqdn %>",
-      "address": "<%= ipaddress %>",
-      "_name": "<%= fqdn.gsub(/\./, '_') %>",
+      "name": "<%= @fqdn %>",
+      "address": "<%= @ipaddress %>",
+      "_name": "<%= @fqdn.gsub(/\./, '_') %>",
       "subscriptions": [ "common", "test", "stats" ]
+    },
+    "rabbitmq": {
+      "ssl": {
+        "private_key_file": "/etc/sensu/ssl/client_key.pem",
+        "cert_chain_file": "/etc/sensu/ssl/client_cert.pem"
+      },
+      "port": 5671,
+      "host": "<%= @mqsrv %>",
+      "user": "<%= @mqsrv_user %>",
+      "password": "<%= @mqsrv_password %>",
+      "vhost": "/sensu"
     }
 }

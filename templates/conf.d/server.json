@@ -1,0 +1,16 @@
+{
+    "redis": {
+      "host": "localhost",
+      "port": 6379
+    },
+    "api": {
+      "host": "localhost",
+      "port": 4567
+    },
+    "dashboard": {
+      "host": "localhost",
+      "port": 8181,
+      "user": "<%= @dashboard_user %>",
+      "password": "<%= @dashboard_password %>"
+    }
+}

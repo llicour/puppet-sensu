@@ -2,15 +2,12 @@
 # https://github.com/joemiller/joemiller.me-intro-to-sensu
 # http://joemiller.me/2012/02/02/sensu-and-graphite/
 
-class sensu( $mqsrv='el6a.labolinux.fr' ) {
+class sensu( $mqsrv         ='el6a.labolinux.fr',
+             $mqsrv_user    ='sensu',
+             $mqsrv_password='plokiploki' )
+{
 
-    yumrepo { 'sensu' :
-        baseurl  =>
-              'http://repos.sensuapp.org/yum/el/$releasever/$basearch/',
-        descr    => 'sensu-main',
-        enabled  => 1,
-        gpgcheck => 0,
-    }
+    include yum::sensu
 
     package { 'sensu' :
         ensure  => present,
@@ -25,38 +22,36 @@ class sensu( $mqsrv='el6a.labolinux.fr' ) {
         require => Package[ 'sensu' ],
     }
 
-    # You can generate the CA and the key with helper scripts from
-    # git://github.com/joemiller/joemiller.me-intro-to-sensu.git
-
-    file { 'client_cert.pem' :
+    # SSL certificates generated from autopki
+    file { '/etc/sensu/ssl/cacert.pem' :
+        ensure  => present,
+        path    => '/etc/sensu/ssl/cacert.pem',
+        owner   => 'sensu',
+        group   => 'sensu',
+        mode    => '0644',
+        source  => "puppet:///private/rabbitmq/cacert.pem",
+        require => File[ '/etc/sensu/ssl' ],
+        notify => Service["sensu-client"],
+    }
+    file { '/etc/sensu/ssl/client_cert.pem' :
         ensure  => present,
         path    => '/etc/sensu/ssl/client_cert.pem',
-        owner   => 'root',
-        group   => 'root',
+        owner   => 'sensu',
+        group   => 'sensu',
         mode    => '0644',
-        source  => 'puppet:///modules/sensu/ssl/client_cert.pem',
+        source  => "puppet:///private/rabbitmq/client_cert.pem",
         require => File[ '/etc/sensu/ssl' ],
+        notify => Service["sensu-client"],
     }
-
-    file { 'client_key.pem' :
+    file { '/etc/sensu/ssl/client_key.pem' :
         ensure  => present,
         path    => '/etc/sensu/ssl/client_key.pem',
-        owner   => 'root',
-        group   => 'root',
-        mode    => '0644',
-        source  => 'puppet:///modules/sensu/ssl/client_key.pem',
-        require => File[ 'client_cert.pem' ],
-    }
-
-
-    file { 'config.json' :
-        ensure  => present,
-        path    => '/etc/sensu/config.json',
-        owner   => 'root',
-        group   => 'root',
-        mode    => '0644',
-        content => template( 'sensu/config.json' ),
-        require => Package[ 'sensu' ],
+        owner   => 'sensu',
+        group   => 'sensu',
+        mode    => '0400',
+        source  => "puppet:///private/rabbitmq/client_key.pem",
+        require => File[ '/etc/sensu/ssl' ],
+        notify => Service["sensu-client"],
     }
 
     file { '/etc/sensu/conf.d' :
@@ -75,6 +70,7 @@ class sensu( $mqsrv='el6a.labolinux.fr' ) {
         mode    => '0644',
         content => template( 'sensu/conf.d/client.json' ),
         require => File[ '/etc/sensu/conf.d' ],
+        notify => Service["sensu-client"],
     }
 
     file { 'checks.json' :
@@ -155,9 +151,12 @@ class sensu( $mqsrv='el6a.labolinux.fr' ) {
     service { 'sensu-client' :
         ensure    => running,
         enable    => true,
-        require   => [  Package[ 'sensu', 'sensu-plugin' ],
-                        File[ 'client_key.pem','config.json','client.json',
-                              'checks.json','handlers.json' ], ],
+        require   => [  Package[ 'sensu' ],
+                        File[ '/etc/sensu/ssl/client_key.pem',
+                              '/etc/sensu/ssl/client_cert.pem',
+                              'client.json',
+                              'checks.json',
+                              'handlers.json' ], ],
     }
 }
 
