@@ -1,3 +1,6 @@
+# Sensu monitoring server
+# cf http://sensuapp.org/
+
 class sensu::server ( $up = hiera('sensu::server::up', true) ) inherits sensu {
 
     include rabbitmq

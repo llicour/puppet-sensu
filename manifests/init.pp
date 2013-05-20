@@ -2,8 +2,8 @@
 # https://github.com/joemiller/joemiller.me-intro-to-sensu
 # http://joemiller.me/2012/02/02/sensu-and-graphite/
 
-class sensu( $mqsrv='el6a.labolinux.fr',
-             $repo='http://repos.sensuapp.org/yum/el/$release/$arch' ) {
+class sensu(  $mqsrv='el6a.labolinux.fr',
+              $repo='http://repos.sensuapp.org/yum/el/$release/$arch' ) {
 
     yumrepo { 'sensu' :
         baseurl  => $repo,
