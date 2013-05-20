@@ -92,7 +92,6 @@ class sensu::server ( $up = true,
         require => File[ '/root/sensu' ],
     }
 
-/*
     include myfirewall
 
     firewall { '100 Sensu Dashboard' :
@@ -110,7 +109,6 @@ class sensu::server ( $up = true,
           dport  => '4567',
           action => 'accept',
     }
-*/
 
 }
 
